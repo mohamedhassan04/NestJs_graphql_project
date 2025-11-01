@@ -3,13 +3,13 @@
 # ------------------------------------------------------
 
 type UserSetting {
-  userId: Int!
+  userId: String!
   receiveNotifications: Boolean!
   receiveEmails: Boolean!
 }
 
 type User {
-  id: Int!
+  id: String!
   username: String!
   email: String!
   displayName: String!
@@ -18,7 +18,7 @@ type User {
 
 type Query {
   getUser: User!
-  getUserById(id: Int!): User
+  getUserById(id: String!): User!
   getAllUsers: [User!]!
 }
 

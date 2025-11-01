@@ -10,11 +10,13 @@ import {
 import { User } from '../models/User';
 import { mockUsers } from 'src/__mocks__/mockUsers';
 import { UserSetting } from '../models/UserSetting';
-import { mockUserSettings } from 'src/__mocks__/mockUserSetting';
 import { CreateUserInput } from '../utils/CreateUserInput';
+import { UserService } from '../services/user.service';
 
 @Resolver((of) => User)
 export class UserResolver {
+  constructor(private readonly userService: UserService) {}
+
   @Query((returns) => User)
   getUser() {
     return {
@@ -25,31 +27,23 @@ export class UserResolver {
     };
   }
 
-  @Query((returns) => User, { nullable: true })
-  getUserById(@Args('id', { type: () => Int }) id: number) {
-    return mockUsers.find((user) => user.id === id);
+  @Query(() => User)
+  async getUserById(@Args('id', { type: () => String }) id: string) {
+    return this.userService.getUserById(id);
   }
 
   @Query((returns) => [User])
-  getAllUsers() {
-    return mockUsers;
+  async getAllUsers() {
+    return await this.userService.getAllUsers();
   }
 
   @ResolveField((returns) => UserSetting, { name: 'settings', nullable: true })
   getUserSettings(@Parent() user: User) {
-    return mockUserSettings.find((setting) => setting.userId === user.id);
+    // return mockUserSettings.find((setting) => setting.userId === user.id);
   }
 
   @Mutation((returns) => User)
-  createUser(@Args('createUserData') createUserData: CreateUserInput) {
-    const { email, username, displayName } = createUserData;
-    const newUser = {
-      id: mockUsers.length + 1,
-      email,
-      username,
-      displayName,
-    };
-    mockUsers.push(newUser);
-    return newUser;
+  async createUser(@Args('createUserData') createUserData: CreateUserInput) {
+    return await this.userService.createUser(createUserData);
   }
 }
